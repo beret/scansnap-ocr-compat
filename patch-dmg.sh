@@ -79,18 +79,20 @@ input_owner=$(stat -f '%u:%g' "$input") || die 'cannot read input ownership'
 work=$(mktemp -d "${TMPDIR:-/tmp}/scansnap-ocr-pkg.XXXXXXXX") || die 'cannot create temporary working directory'
 publish_dir=''
 mounted=0
+source_device=''
+detach_source() {
+    (( mounted )) || return 0
+    if [[ -n $source_device ]] && /usr/bin/hdiutil info | grep -Fq "$source_device"; then
+        hdiutil detach "$source_device" >/dev/null || return 1
+    fi
+    mounted=0
+}
 cleanup() {
     local status=$?
     trap - EXIT
-    if (( mounted )); then
-        if [[ $(stat -f '%d' "$work/mount") == $(stat -f '%d' "$work") ]]; then
-            mounted=0
-        elif ! hdiutil detach "$work/mount" >/dev/null; then
-            printf 'patch-dmg: could not detach temporary mount %s; detach it manually\n' "$work/mount" >&2
-            status=1
-        else
-            mounted=0
-        fi
+    if ! detach_source; then
+        printf 'patch-dmg: could not detach temporary mount %s; detach it manually\n' "${source_device:-$work/mount}" >&2
+        status=1
     fi
     if (( ! mounted )); then rm -rf "$work" || status=1; fi
     if [[ -n "$publish_dir" ]]; then rm -rf "$publish_dir" || status=1; fi
@@ -102,8 +104,11 @@ publish_dir=$(mktemp -d "$output_dir/.scansnap-ocr-output.XXXXXXXX") || die 'can
 
 if [[ $kind == dmg ]]; then
     mkdir "$work/mount" || die 'cannot create mount point'
+    attachment=$(hdiutil attach -readonly -nobrowse -mountpoint "$work/mount" "$input") ||
+        die 'cannot attach source image read-only'
     mounted=1
-    hdiutil attach -readonly -nobrowse -mountpoint "$work/mount" "$input" >/dev/null || die 'cannot attach source image read-only'
+    source_device=$(printf '%s\n' "$attachment" | awk '/^\/dev\/disk/ {print $1; exit}')
+    [[ -n $source_device ]] || die 'cannot identify the attached source image device'
     source_pkg="$work/mount/ScanSnap Manager.pkg"
     [[ -f "$source_pkg" && ! -L "$source_pkg" ]] || die 'image must contain a flat ScanSnap Manager.pkg at its root'
     ditto "$work/mount" "$work/image" || die 'cannot copy image contents to the staging directory'
@@ -186,8 +191,7 @@ cp -p "$work/rebuilt/Payload" "$component/Payload" || die 'cannot replace compon
 if [[ $kind == dmg ]]; then
     pkgutil --flatten "$expanded" "$work/new.pkg" || die 'cannot rebuild installer distribution'
     cp -p "$work/new.pkg" "$work/image/ScanSnap Manager.pkg" || die 'cannot replace staged image package'
-    hdiutil detach "$work/mount" >/dev/null || die 'cannot detach source image'
-    mounted=0
+    detach_source || die 'cannot detach source image'
     candidate="$publish_dir/output.dmg"
     hdiutil create -quiet -format UDZO -srcfolder "$work/image" "$candidate" || die 'cannot create patched disk image'
 else
