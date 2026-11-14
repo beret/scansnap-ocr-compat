@@ -84,21 +84,30 @@ work=$(mktemp -d "${TMPDIR:-/tmp}/scansnap-ocr-pkg.XXXXXXXX") || die 'cannot cre
 publish_dir=''
 mounted=0
 source_device=''
+is_mountpoint() {
+    [[ $(/usr/bin/stat -f '%d' "$1" 2>/dev/null) != $(/usr/bin/stat -f '%d' "$(/usr/bin/dirname "$1")" 2>/dev/null) ]]
+}
 detach_source() {
     (( mounted )) || return 0
-    if [[ -n $source_device ]] && /usr/bin/hdiutil info | grep -Fq "$source_device"; then
-        hdiutil detach "$source_device" >/dev/null || return 1
+    if is_mountpoint "$work/mount"; then
+        hdiutil detach "$work/mount" >/dev/null 2>&1 || true
+        if is_mountpoint "$work/mount" && [[ -n $source_device ]]; then
+            hdiutil detach "$source_device" >/dev/null 2>&1 || true
+        fi
+        is_mountpoint "$work/mount" && return 1
     fi
     mounted=0
+    return 0
 }
 cleanup() {
     local status=$?
     trap - EXIT
     if ! detach_source; then
-        printf 'patch-dmg: could not detach temporary mount %s; detach it manually\n' "${source_device:-$work/mount}" >&2
+        printf 'patch-dmg: source image is still mounted; work kept at %s\n' "$work" >&2
+        status=1
+    elif ! rm -rf "$work"; then
         status=1
     fi
-    if (( ! mounted )); then rm -rf "$work" || status=1; fi
     if [[ -n "$publish_dir" ]]; then rm -rf "$publish_dir" || status=1; fi
     exit "$status"
 }
