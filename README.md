@@ -83,3 +83,7 @@ Restore puts the vendor app back, retains the vendor backup, and saves the displ
 
 For the patched-installer path, keep the original installer or the `.original` backup.
 To return to the stock app, normal uninstall and then installation with the stock installer.
+
+## License
+This was coded by LLM and is thus uncopyrightable.
+deepseek v4.1 flash and gpt6.1 terra
