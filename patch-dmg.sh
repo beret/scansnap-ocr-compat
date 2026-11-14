@@ -23,10 +23,15 @@ so a plain invocation works within that window. The vendor's distribution,
 choices, resources and installer scripts are retained,
 including its checks: the distribution refuses to install over an already
 installed 7.2.70 WW Manager. Use the installed-app repair mode in that case.
-The rebuilt package and image are unsigned and not notarized. The modified app
+The rebuilt package and image are unsigned and notarized. The modified app
 and OCR helper are locally signed, not vendor-signed or notarized; macOS may
 require an explicit approval to open the installer. No security settings are
 changed by this script. Only process installer files from a trusted source.
+
+This repository ships code only, never vendor installers. Obtain the matching
+PFU package from your ScanSnap download or from
+https://origin.pfultd.com/downloads/IMAGE/driver/ss/inst/ix1500/m-software/
+(archived at https://web.archive.org/ once the vendor moves it).
 EOF
 }
 
