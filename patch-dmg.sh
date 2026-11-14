@@ -17,8 +17,10 @@ backup. It requires a regular file and a filesystem supporting hard links.
 Legacy directory/bundle packages and different package layouts are rejected.
 
 Root is required to preserve payload ownership. Several gigabytes of free
-space are needed both in the temporary directory and beside the output. The
-vendor's distribution, choices, resources and installer scripts are retained,
+space are needed both in the temporary directory and beside the output. If a
+valid sudo timestamp already exists, this script re-executes itself under sudo,
+so a plain invocation works within that window. The vendor's distribution,
+choices, resources and installer scripts are retained,
 including its checks: the distribution refuses to install over an already
 installed 7.2.70 WW Manager. Use the installed-app repair mode in that case.
 The rebuilt package and image are unsigned and not notarized. The modified app
@@ -31,6 +33,12 @@ EOF
 die() { printf 'patch-dmg: %s\n' "$*" >&2; exit 1; }
 
 if [[ ${1:-} == --help || ${1:-} == -h ]]; then usage; exit 0; fi
+# Re-exec under sudo when a timestamp is already valid, so both invocation
+# styles work. Without a primed timestamp the run continues unprivileged and
+# stops at the ownership gate after reporting any real input problems.
+if [[ $(id -u) != 0 ]] && /usr/bin/sudo -n /usr/bin/true 2>/dev/null; then
+    exec /usr/bin/sudo -n -- "$0" "$@"
+fi
 in_place=0
 if [[ ${1:-} == --in-place ]]; then
     [[ $# == 2 ]] || { usage >&2; exit 2; }
