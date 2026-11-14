@@ -1,0 +1,33 @@
+#!/bin/bash
+set -eu
+
+root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+case "${1:-}" in
+  app)
+    shift
+    exec "$root/patch-app.sh" "$@"
+    ;;
+  package)
+    shift
+    exec "$root/patch-dmg.sh" "$@"
+    ;;
+  -h|--help|help|'')
+    cat <<'HELP'
+Usage:
+  scansnap-ocr app [install|restore|stage] ...
+  scansnap-ocr package ...
+
+Use 'scansnap-ocr app --help' or 'scansnap-ocr package --help' for
+arguments, safety requirements, and signing consequences.
+
+This targets the verified ScanSnap Manager 7.2.70 OCR worker. Patched
+applications are locally ad-hoc signed, not vendor-signed or notarized.
+The original installation and input installer should be backed up before
+modification. This tool does not alter scanner profiles or macOS security.
+HELP
+    ;;
+  *)
+    printf 'Unknown command: %s\nUse scansnap-ocr --help.\n' "$1" >&2
+    exit 2
+    ;;
+esac
