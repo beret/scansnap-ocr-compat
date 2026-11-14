@@ -28,10 +28,9 @@ and OCR helper are locally signed, not vendor-signed or notarized; macOS may
 require an explicit approval to open the installer. No security settings are
 changed by this script. Only process installer files from a trusted source.
 
-This repository ships code only, never vendor installers. Obtain the matching
-PFU package from your ScanSnap download or from
-https://origin.pfultd.com/downloads/IMAGE/driver/ss/inst/ix1500/m-software/
-(archived at https://web.archive.org/ once the vendor moves it).
+Vanilla installer, not shipped here: MacManagerV72L70WW.dmg
+  https://origin.pfultd.com/downloads/IMAGE/driver/ss/inst/ix1500/m-software/MacManagerV72L70WW.dmg
+  https://web.archive.org/web/*/https://origin.pfultd.com/downloads/IMAGE/driver/ss/inst/ix1500/m-software/MacManagerV72L70WW.dmg
 EOF
 }
 
