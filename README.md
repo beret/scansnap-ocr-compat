@@ -5,11 +5,9 @@
 ## Why?
 No _good_ reason. Just try ScanSnap Home, it probably won't kill you?
 
-If ScanSnap Home doesn't still have secret support for your hardware, consider something like the options here: <https://notes.max.engineer/replacing-scansnap-manager-on-macos/>
+If ScanSnap Home doesn't still have secret support for your hardware, consider something like the paths here which also may have better OCR: <https://notes.max.engineer/replacing-scansnap-manager-on-macos/>
 
-
-
-# Bug: Carbon is old and so is ScanSnap Manager
+## Bug: Carbon is old and so is ScanSnap Manager
 ScanSnap Manager 7.2.70.1001 is an Intel application that runs under Rosetta on Apple Silicon.
 On macOS 27.2 (26B123), its searchable-PDF OCR hangs and fails.
 
@@ -69,7 +67,7 @@ sudo ./scansnap-ocr package --in-place MacManagerV72L70WW.dmg
 
 This first retains the original as `MacManagerV72L70WW.dmg.original` without overwriting an existing backup. In-place replacement requires a filesystem that supports hard links. Thus neither installed-app repair nor installer replacement overwrites its original without retaining a copy; disposable `stage` is the exception described above.
 
-The rebuilt installer is **unsigned and unnotarized** and untested. You'll may  need to give Gatekeeper approval in macOS Settings. For a clean install, open the rebuilt image and run its `ScanSnap Manager.pkg`.
+The rebuilt installer is **unsigned and unnotarized** and untested. You may need to give Gatekeeper approval in macOS Settings. For a clean install, open the rebuilt image and run its `ScanSnap Manager.pkg`.
 
 The stock installer won't overwrite a same-version install, so use installed-app repair if you already have it installed.
 
