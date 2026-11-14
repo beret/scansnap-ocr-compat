@@ -42,7 +42,6 @@ else
     input=$1
     output=$2
 fi
-[[ $(id -u) == 0 ]] || die 'run this command with sudo so payload ownership is preserved'
 [[ -f "$input" && ! -L "$input" ]] || die "input must be a regular, non-symlink file (legacy bundle packages are unsupported): $input"
 input_dir=$(cd "$(dirname "$input")" && pwd -P) || die 'cannot resolve input directory'
 input="$input_dir/$(basename "$input")"
@@ -131,6 +130,7 @@ lsbom -p ug "$component/Bom" | awk 'NR > 1 && $0 != "0\t80" { bad=1 } END { exit
 
 # Expand just the selected component. Rebuild its payload and BOM together with
 # pkgbuild; flatten-full alone would leave the original, now stale BOM in place.
+[[ $(id -u) == 0 ]] || die 'run this command with sudo so payload ownership is preserved'
 pkgutil --flatten "$component" "$work/component.pkg" || die 'cannot flatten component for payload extraction'
 pkgutil --expand-full "$work/component.pkg" "$work/full-component" || die 'cannot extract component payload'
 payload="$work/full-component/Payload"
@@ -149,6 +149,10 @@ pkgbuild --root "$payload" --ownership preserve --filter '^$' \
     --compression legacy "$work/rebuilt-component.pkg" || die 'cannot rebuild component payload and BOM'
 pkgutil --expand "$work/rebuilt-component.pkg" "$work/rebuilt" || die 'cannot expand rebuilt component'
 [[ -f "$work/rebuilt/Bom" && -f "$work/rebuilt/Payload" ]] || die 'rebuilt component is missing its BOM or payload'
+# pkgbuild writes the invoker's ownership if the chown above did not apply;
+# catch that before an installer can deposit user-owned files in /Applications.
+lsbom -p ug "$work/rebuilt/Bom" | awk 'NR > 1 && $0 != "0\t80" { bad=1 } END { exit bad }' ||
+    die 'rebuilt payload does not have root:admin ownership; run with sudo'
 [[ $(grep -c '^[[:space:]]*<payload[[:space:]]' "$info") == 1 && $(grep -c '^[[:space:]]*<payload[[:space:]]' "$work/rebuilt/PackageInfo") == 1 ]] || die 'unsupported PackageInfo payload metadata layout'
 payload_info=$(grep '^[[:space:]]*<payload[[:space:]]' "$work/rebuilt/PackageInfo") || die 'cannot read rebuilt payload metadata'
 awk -v replacement="$payload_info" '/^[[:space:]]*<payload[[:space:]]/ { print replacement; next } { print }' "$info" > "$work/PackageInfo" || die 'cannot update component payload metadata'

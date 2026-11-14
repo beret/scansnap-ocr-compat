@@ -20,6 +20,9 @@ APP.pre-restore.XXXXXXXX/Replaced.app. Both modes refuse while any ScanSnap
 Manager is running. They need write access to APP and its parent directory.
 
 The patch is ad-hoc signed; it does not change SIP, privacy settings or profiles.
+install leaves the patched bundle owned by the invoking user; the vendor copy
+kept in the backup is unchanged. Use the installer path if vendor root:admin
+ownership must be preserved.
 EOF
 }
 
