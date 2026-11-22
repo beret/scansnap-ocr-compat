@@ -18,6 +18,13 @@ The library changes only a successful `GetProcessInformation` result for the wor
 
 The Manager and helper retain their vendor entitlements. The preserved worker also receives the entitlement needed to honor `DYLD_INSERT_LIBRARIES` under the hardened runtime. The modified app and helpers are ad-hoc signed instead of vendor-signed.
 
+## Alternative: OCR after the scan, vendor app untouched
+
+`appleocr/` adds a text layer to saved PDFs with Apple's Vision engine through
+OCRmyPDF, leaving ScanSnap Manager and its profiles alone. It installs the
+packaged plugin `ocrmypdf-appleocr` and verifies that every scanned image stream
+stays byte-identical. See [appleocr/README.md](appleocr/README.md).
+
 ## Requirements and limits
 
 The app patch accepts only a stock, PFU-signed ScanSnap Manager 7.2.70, build 1001, with the expected OCR helper and no symlinks inside that helper. It checks the Manager and helper signatures and the helper executable's SHA-256. Other versions and already patched apps are rejected. App paths containing `:` are unsupported.
