@@ -19,8 +19,7 @@ profile folder and documents its filters, output type and logging in
 This creates `$HOME/.local/share/ocrmypdf-appleocr/venv` (override with
 `OCR_VENV`) and installs pinned `ocrmypdf==17.14.2` and
 `ocrmypdf-appleocr==0.4.2`. Override `OCRMYPDF_VERSION` / `PLUGIN_VERSION` to
-test other releases. Afterwards `~/.local/bin/ocrmypdf-appleocr` points at the
-venv's `ocrmypdf`.
+test other releases. The venv's `ocrmypdf` is invoked by absolute path.
 
 ## Invocation
 
