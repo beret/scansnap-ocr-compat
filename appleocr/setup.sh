@@ -22,4 +22,4 @@ fi
 
 printf 'ocrmypdf: %s\n' "$("$VENV/bin/ocrmypdf" --version)"
 printf 'engine:   %s\n' "$("$VENV/bin/python" -c 'from ocrmypdf_appleocr import AppleOCREngine; print(AppleOcrEngine.version())' 2>/dev/null || echo 'appleocr installed')"
-printf '\nrun scans with: %s/appleocr/ocr-scan.sh FILE.pdf ...\n' "$(cd "$(dirname "$0")/.." && pwd)"
+printf '\nscans are OCRed by ~/repos/infra/bin/ocr-watch.sh (see hosts/nova/README.md there)\n'

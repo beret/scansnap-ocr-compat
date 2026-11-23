@@ -20,10 +20,11 @@ The Manager and helper retain their vendor entitlements. The preserved worker al
 
 ## Alternative: OCR after the scan, vendor app untouched
 
-`appleocr/` adds a text layer to saved PDFs with Apple's Vision engine through
-OCRmyPDF, leaving ScanSnap Manager and its profiles alone. It installs the
-packaged plugin `ocrmypdf-appleocr` and verifies that every scanned image stream
-stays byte-identical. See [appleocr/README.md](appleocr/README.md).
+`appleocr/` installs Apple's Vision engine for OCRmyPDF, leaving ScanSnap
+Manager and its profiles alone. The packaged plugin `ocrmypdf-appleocr` performs
+the recognition; running it over saved scans is handled outside this repository
+by the host watcher `~/repos/infra/bin/ocr-watch.sh`. See
+[appleocr/README.md](appleocr/README.md).
 
 ## Requirements and limits
 
