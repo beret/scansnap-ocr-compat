@@ -19,7 +19,7 @@ Options:
   -h, --help           show this help
 
 Environment:
-  OCR_VENV           venv created by setup.sh (default ~/venvs/ocrmypdf-appleocr)
+  OCR_VENV           venv created by setup.sh (default ~/.local/share/ocrmypdf-appleocr/venv)
   OCR_JOBS           worker count passed to ocrmypdf
   OCR_KEEP_WORKDIR   set to keep intermediate files
 EOF
